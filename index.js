@@ -79,8 +79,7 @@ mongoose
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-// Endpoint to upload Excel file
-app.post("/upload-excel", upload.single("file"), async (req, res) => {
+/app.post("/upload-excel", upload.single("file"), async (req, res) => {
   if (!req.file) {
     return res.status(400).send("No file uploaded.");
   }
@@ -96,22 +95,30 @@ app.post("/upload-excel", upload.single("file"), async (req, res) => {
 
     // Iterate over each row in the Excel data
     for (const row of data) {
-      const applicantId = new mongoose.Types.ObjectId(row.applicant); // Convert to ObjectId
-      const jobId = new mongoose.Types.ObjectId(row.job); // Convert to ObjectId
+      let applicantId = null;
+      let jobId = null;
+
+      // Only assign ObjectIds if the fields are present
+      if (row.applicant) {
+        applicantId = new mongoose.Types.ObjectId(row.applicant);
+      }
+      if (row.job) {
+        jobId = new mongoose.Types.ObjectId(row.job);
+      }
 
       // Handle nested workExperience data
       const workExperience = row["workExperience.company"]
         ? [{
-          company: row["workExperience.company"] || "",
-          position: row["workExperience.position"] || "",
-          duration: row["workExperience.duration"] || "",
-        }]
+            company: row["workExperience.company"] || "",
+            position: row["workExperience.position"] || "",
+            duration: row["workExperience.duration"] || "",
+          }]
         : [];
 
       // Create a new application entry
       const newApplication = new Application({
-        applicant: applicantId,
-        job: jobId,
+        applicant: applicantId, // Could be null
+        job: jobId, // Could be null
         resume: row.resume || "",
         coverLetter: row.coverLetter || "",
         firstName: row.firstName || "",
@@ -128,7 +135,7 @@ app.post("/upload-excel", upload.single("file"), async (req, res) => {
         academicLevel: row.academicLevel || "",
         workExperience: workExperience,
         salaryInfo: row.salaryInfo || "",
-        cv: row.cv || ""
+        cv: row.cv || "",
       });
 
       // Save the application to the database
@@ -141,6 +148,7 @@ app.post("/upload-excel", upload.single("file"), async (req, res) => {
     res.status(500).send("Error uploading applications.");
   }
 });
+
 
 app.get("/api/check-session", (req, res) => {
   if (req.session && req.session.user) {
