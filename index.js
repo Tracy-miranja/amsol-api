@@ -43,8 +43,12 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-const allowedOrigins = ["http://localhost:5174", "http://localhost:5173","http://api.amsoljobs.africa", "amsoljobs.africa"];
-
+const allowedOrigins = [
+  "http://localhost:5174",
+  "http://localhost:5173",
+  "http://api.amsoljobs.africa",
+  "https://amsoljobs.africa"
+];
 const corsOptions = {
   origin: (origin, callback) => {
     if (allowedOrigins.includes(origin) || !origin) {
@@ -76,66 +80,66 @@ mongoose
 
 // Endpoint to upload Excel file
 app.post("/upload-excel", upload.single("file"), async (req, res) => {
-    if (!req.file) {
-      return res.status(400).send("No file uploaded.");
+  if (!req.file) {
+    return res.status(400).send("No file uploaded.");
+  }
+
+  try {
+    // Read the uploaded Excel file
+    const workbook = xlsx.readFile(req.file.path);
+    const sheetName = workbook.SheetNames[0]; // Assume the first sheet contains data
+    const sheet = workbook.Sheets[sheetName];
+
+    // Convert sheet data to JSON
+    const data = xlsx.utils.sheet_to_json(sheet);
+
+    // Iterate over each row in the Excel data
+    for (const row of data) {
+      const applicantId = new mongoose.Types.ObjectId(row.applicant); // Convert to ObjectId
+      const jobId = new mongoose.Types.ObjectId(row.job); // Convert to ObjectId
+
+      // Handle nested workExperience data
+      const workExperience = row["workExperience.company"]
+        ? [{
+          company: row["workExperience.company"] || "",
+          position: row["workExperience.position"] || "",
+          duration: row["workExperience.duration"] || "",
+        }]
+        : [];
+
+      // Create a new application entry
+      const newApplication = new Application({
+        applicant: applicantId,
+        job: jobId,
+        resume: row.resume || "",
+        coverLetter: row.coverLetter || "",
+        firstName: row.firstName || "",
+        secondName: row.secondName || "",
+        lastName: row.lastName || "",
+        idNumber: row.idNumber || "",
+        whatsAppNo: row.whatsAppNo || "",
+        phoneNumber: row.phoneNumber || "",
+        email: row.email || "",
+        age: row.age || 0,
+        nationality: row.nationality || "",
+        location: row.location || "",
+        specialization: row.specialization || "",
+        academicLevel: row.academicLevel || "",
+        workExperience: workExperience,
+        salaryInfo: row.salaryInfo || "",
+        cv: row.cv || ""
+      });
+
+      // Save the application to the database
+      await newApplication.save();
     }
-  
-    try {
-      // Read the uploaded Excel file
-      const workbook = xlsx.readFile(req.file.path);
-      const sheetName = workbook.SheetNames[0]; // Assume the first sheet contains data
-      const sheet = workbook.Sheets[sheetName];
-  
-      // Convert sheet data to JSON
-      const data = xlsx.utils.sheet_to_json(sheet);
-  
-      // Iterate over each row in the Excel data
-      for (const row of data) {
-        const applicantId = new mongoose.Types.ObjectId(row.applicant); // Convert to ObjectId
-        const jobId = new mongoose.Types.ObjectId(row.job); // Convert to ObjectId
-  
-        // Handle nested workExperience data
-        const workExperience = row["workExperience.company"]
-          ? [{
-              company: row["workExperience.company"] || "",
-              position: row["workExperience.position"] || "",
-              duration: row["workExperience.duration"] || "",
-            }]
-          : [];
-  
-        // Create a new application entry
-        const newApplication = new Application({
-          applicant: applicantId,
-          job: jobId,
-          resume: row.resume || "",
-          coverLetter: row.coverLetter || "",
-          firstName: row.firstName || "",
-          secondName: row.secondName || "",
-          lastName: row.lastName || "",
-          idNumber: row.idNumber || "",
-          whatsAppNo: row.whatsAppNo || "",
-          phoneNumber: row.phoneNumber || "",
-          email: row.email || "",
-          age: row.age || 0,
-          nationality: row.nationality || "",
-          location: row.location || "",
-          specialization: row.specialization || "",
-          academicLevel: row.academicLevel || "",
-          workExperience: workExperience,
-          salaryInfo: row.salaryInfo || "",
-          cv: row.cv || ""
-        });
-  
-        // Save the application to the database
-        await newApplication.save();
-      }
-  
-      res.send("Applications uploaded successfully.");
-    } catch (error) {
-      console.error("Error uploading applications:", error);
-      res.status(500).send("Error uploading applications.");
-    }
-  });
+
+    res.send("Applications uploaded successfully.");
+  } catch (error) {
+    console.error("Error uploading applications:", error);
+    res.status(500).send("Error uploading applications.");
+  }
+});
 
 app.get("/api/check-session", (req, res) => {
   if (req.session && req.session.user) {
