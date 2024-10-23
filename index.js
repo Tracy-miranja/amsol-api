@@ -48,8 +48,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://api.amsoljobs.africa",
   "https://amsoljobs.africa",
-  " https://amsol-api.onrender.com/api/register",
-  "https://amsol-api.onrender.com/api/login"
+  "https://amsol-api.onrender.com"  // Just the base URL
 ];
 const corsOptions = {
   origin: (origin, callback) => {
@@ -253,8 +252,8 @@ app.post("/api/login", async (req, res) => {
     });
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "lax",
-      secure: false, // Set true in production with HTTPS
+      sameSite: "none",//IAX
+      secure: true, // Set true in production with HTTPS
     });
     res.json({ message: "Login successful!", id: user._id, token, role: user.role });
   } catch (error) {
