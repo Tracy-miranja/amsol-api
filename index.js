@@ -48,6 +48,7 @@ const corsOptions = {
     const allowedOrigins = [
       "http://localhost:5174",
       "http://localhost:5173",
+      "https://amsoljobs.africa/",
       /\.amsoljobs\.africa$/,  // Regex to allow all subdomains
     ];
     
