@@ -43,27 +43,27 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-const allowedOrigins = [
-  "http://localhost:5174",
-  "http://localhost:5173",
-  "http://api.amsoljobs.africa",
-  "https://amsoljobs.africa",
-  "https://amsol-api.onrender.com"  // Just the base URL
-];
 const corsOptions = {
   origin: (origin, callback) => {
-    if (allowedOrigins.includes(origin) || !origin) {
+    const allowedOrigins = [
+      "http://localhost:5174",
+      "http://localhost:5173",
+      /\.amsoljobs\.africa$/,  // Regex to allow all subdomains
+    ];
+    
+    if (allowedOrigins.some(o => o instanceof RegExp ? o.test(origin) : o === origin) || !origin) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
     }
   },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,  // Required to allow cookies across subdomains
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // Handle preflight requests
 
 // Database Instance
 require("dotenv").config();
@@ -254,6 +254,7 @@ app.post("/api/login", async (req, res) => {
       httpOnly: true,
       sameSite: "none",//IAX
       secure: true, // Set true in production with HTTPS
+      domain: ".amsoljobs.africa",
     });
     res.json({ message: "Login successful!", id: user._id, token, role: user.role });
   } catch (error) {
