@@ -60,7 +60,7 @@ const applicationSchema = new mongoose.Schema(
       },
     ],
     salaryInfo: { type: String },
-    cv: { type: String }
+    cv: { type: String, default:null }
   },
   { timestamps: true }  
 );

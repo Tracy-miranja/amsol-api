@@ -79,7 +79,7 @@ mongoose
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-/app.post("/upload-excel", upload.single("file"), async (req, res) => {
+app.post("/upload-excel", upload.single("file"), async (req, res) => {
   if (!req.file) {
     return res.status(400).send("No file uploaded.");
   }
@@ -660,7 +660,7 @@ app.delete(
 
 // File upload route
 app.post("/api/applications",
-  auth, // Authentication middleware
+   // Authentication middleware
   upload.single("cv"), // Use this for single file uploads
   [
     body("firstName").notEmpty().withMessage("First name is required"),
