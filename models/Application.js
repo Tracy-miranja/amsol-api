@@ -48,7 +48,7 @@ const applicationSchema = new mongoose.Schema(
         "Bachelor’s Degree",
         "Associate's Degree",
         "Diploma",
-        "Certificate",
+        "professional Certificate",
         "others",
       ],
     },
@@ -59,6 +59,7 @@ const applicationSchema = new mongoose.Schema(
         duration: { type: String },
       },
     ],
+    totalExperience:{type: String},
     salaryInfo: { type: String },
     cv: { type: String, default:null }
   },

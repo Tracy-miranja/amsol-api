@@ -48,7 +48,8 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://api.amsoljobs.africa",
   "https://amsoljobs.africa",
-  " https://amsol-api.onrender.com/api/register "
+  " https://amsol-api.onrender.com/api/register",
+  "https://amsol-api.onrender.com/api/login"
 ];
 const corsOptions = {
   origin: (origin, callback) => {
