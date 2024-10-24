@@ -672,7 +672,7 @@ app.delete(
 
 // File upload route
 app.post("/api/applications",
-  auth,// Authentication middleware
+  // auth, // Commented out for testing without authentication
   upload.single("cv"), // Use this for single file uploads
   [
     body("firstName").notEmpty().withMessage("First name is required"),
@@ -687,10 +687,13 @@ app.post("/api/applications",
     }
 
     try {
-      const applicantId = req.user?.id; // Get applicant ID from auth middleware
-      if (!applicantId) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
+      // Commented out applicantId check for now
+      // const applicantId = req.user?.id; // Get applicant ID from auth middleware
+      const applicantId = "test-applicant"; // Dummy applicant ID for testing
+
+      // if (!applicantId) {
+      //   return res.status(401).json({ message: "Unauthorized" });
+      // }
 
       const {
         jobId,
@@ -718,7 +721,6 @@ app.post("/api/applications",
         salaryInfo,
       } = req.body;
 
-      // Construct the work experience array
       const workExperience = [
         { company: company1, position: position1, duration: duration1 },
         { company: company2, position: position2, duration: duration2 },
