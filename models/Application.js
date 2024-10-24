@@ -48,7 +48,7 @@ const applicationSchema = new mongoose.Schema(
         "Bachelor’s Degree",
         "Associate's Degree",
         "Diploma",
-        "professional Certificate",
+        "Professional Certificate",
         "others",
       ],
     },
