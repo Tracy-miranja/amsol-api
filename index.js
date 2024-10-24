@@ -719,6 +719,7 @@ app.post("/api/applications",
         position3,
         duration3,
         salaryInfo,
+        totalExperience
       } = req.body;
 
       // Construct the work experience array
@@ -747,6 +748,7 @@ app.post("/api/applications",
         specialization,
         academicLevel,
         workExperience,
+        totalExperience,
         salaryInfo,
         cv,
       });
@@ -765,20 +767,6 @@ app.post("/api/applications",
 
 
 // Get applications (applicant-specific or all for admin)
-app.get("/api/applications", async (req, res) => {
-  try {
-    // Fetch all applications and populate applicant and job information
-    const applications = await Application.find()
-      .populate("applicant", "-password") // Exclude password field from applicant
-      .populate("job"); // Populate job details
-
-    // Return the applications data
-    return res.json(applications);
-  } catch (error) {
-    console.error("Error fetching applications:", error);
-    res.status(500).json({ message: "Server error" });
-  }
-});
 
 // Get application by ID
 app.get("/api/applications", async (req, res) => {
@@ -801,6 +789,7 @@ app.get("/api/applications", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
 // Update application status
 app.put("/api/applications/:id/status",
 
