@@ -672,7 +672,7 @@ app.delete(
 
 // File upload route
 app.post("/api/applications",
-   // Authentication middleware
+  auth,// Authentication middleware
   upload.single("cv"), // Use this for single file uploads
   [
     body("firstName").notEmpty().withMessage("First name is required"),
