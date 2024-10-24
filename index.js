@@ -672,7 +672,7 @@ app.delete(
 
 // File upload route
 app.post("/api/applications",
-  // auth, // Commenting out Authentication middleware
+  auth, // Commenting out Authentication middleware
   upload.single("cv"), // Use this for single file uploads
   [
     body("firstName").notEmpty().withMessage("First name is required"),
@@ -686,17 +686,17 @@ app.post("/api/applications",
       return res.status(400).json({ errors: errors.array() });
     }
 
-    // try {
-    //   // Temporarily skipping authentication
-    //   // const applicantId = req.user?.id; // Get applicant ID from auth middleware
-    //   const applicantId = "your_test_applicant_id"; // Use a placeholder ID for testing
+    try {
+      // Temporarily skipping authentication
+      // const applicantId = req.user?.id; // Get applicant ID from auth middleware
+      const applicantId = "your_test_applicant_id"; // Use a placeholder ID for testing
       
-    //   if (!applicantId) {
-    //     return res.status(401).json({ message: "Unauthorized" });
-    //   }
+      if (!applicantId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
 
       const {
-        // jobId,
+        jobId,
         firstName,
         secondName,
         lastName,
@@ -732,8 +732,8 @@ app.post("/api/applications",
 
       // Assuming you have an Application model to save to MongoDB
       const application = new Application({
-        // applicant: applicantId,
-        // job: jobId,
+        applicant: applicantId,
+        job: jobId,
         firstName,
         secondName,
         lastName,
