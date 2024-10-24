@@ -671,96 +671,91 @@ app.delete(
 );
 
 // File upload route
-app.post("/api/applications",
-  // auth, // Commented out for testing without authentication
-  upload.single("cv"), // Use this for single file uploads
-  [
-    body("firstName").notEmpty().withMessage("First name is required"),
-    body("email").isEmail().withMessage("Valid email is required"),
-    body("idNumber").isNumeric().withMessage("ID Number must be numeric"),
-    body("phoneNumber").isMobilePhone().withMessage("Invalid phone number"),
-  ],
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    try {
-      // Commented out applicantId check for now
-      // const applicantId = req.user?.id; // Get applicant ID from auth middleware
-      const applicantId = "test-applicant"; // Dummy applicant ID for testing
-
-      // if (!applicantId) {
-      //   return res.status(401).json({ message: "Unauthorized" });
-      // }
-
-      const {
-        jobId,
-        firstName,
-        secondName,
-        lastName,
-        idNumber,
-        whatsAppNo,
-        phoneNumber,
-        email,
-        age,
-        nationality,
-        location,
-        specialization,
-        academicLevel,
-        company1,
-        position1,
-        duration1,
-        company2,
-        position2,
-        duration2,
-        company3,
-        position3,
-        duration3,
-        salaryInfo,
-      } = req.body;
-
-      const workExperience = [
-        { company: company1, position: position1, duration: duration1 },
-        { company: company2, position: position2, duration: duration2 },
-        { company: company3, position: position3, duration: duration3 },
-      ];
-
-      const cv = req.file ? req.file.path : null; // Handle CV upload path
-
-      // Assuming you have an Application model to save to MongoDB
-      const application = new Application({
-        applicant: applicantId,
-        job: jobId,
-        firstName,
-        secondName,
-        lastName,
-        idNumber,
-        whatsAppNo,
-        phoneNumber,
-        email,
-        age,
-        nationality,
-        location,
-        specialization,
-        academicLevel,
-        workExperience,
-        salaryInfo,
-        cv,
-      });
-
-      await application.save();
-      res.status(201).json({
-        message: "Application submitted successfully",
-        application,
-      });
-    } catch (error) {
-      console.error("Application error:", error);
-      res.status(500).json({ message: "Server error" });
-    }
+app.post("/api/applications", upload.single("cv"), [
+  body("firstName").notEmpty().withMessage("First name is required"),
+  body("email").isEmail().withMessage("Valid email is required"),
+  body("idNumber").isNumeric().withMessage("ID Number must be numeric"),
+  body("phoneNumber").isMobilePhone().withMessage("Invalid phone number"),
+  // You can add other field validations as necessary
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
   }
-);
+
+  try {
+    // Use a hardcoded ObjectId for testing purposes if provided
+    const applicantId = req.body.applicantId
+      ? new mongoose.Types.ObjectId(req.body.applicantId)
+      : null; // No applicantId provided
+
+    const jobId = req.body.jobId
+      ? new mongoose.Types.ObjectId(req.body.jobId)
+      : null; // No jobId provided
+
+    const {
+      firstName,
+      secondName,
+      lastName,
+      idNumber,
+      whatsAppNo,
+      phoneNumber,
+      email,
+      age,
+      nationality,
+      location,
+      specialization,
+      academicLevel,
+      company1,
+      position1,
+      duration1,
+      company2,
+      position2,
+      duration2,
+      company3,
+      position3,
+      duration3,
+      salaryInfo,
+    } = req.body;
+
+    const workExperience = [
+      { company: company1, position: position1, duration: duration1 },
+      { company: company2, position: position2, duration: duration2 },
+      { company: company3, position: position3, duration: duration3 },
+    ];
+
+    const cv = req.file ? req.file.path : null;
+
+    const application = new Application({
+      applicant: applicantId, // Set to null if not provided
+      job: jobId, // Set to null if not provided
+      firstName,
+      secondName,
+      lastName,
+      idNumber,
+      whatsAppNo,
+      phoneNumber,
+      email,
+      age,
+      nationality,
+      location,
+      specialization,
+      academicLevel,
+      workExperience,
+      salaryInfo,
+      cv,
+    });
+
+    await application.save();
+    res.status(201).json({
+      message: "Application submitted successfully",
+      application,
+    });
+  } catch (error) {
+    console.error("Application error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 // Get applications (applicant-specific or all for admin)
 app.get("/api/applications", async (req, res) => {
