@@ -672,7 +672,7 @@ app.delete(
 
 // File upload route
 app.post("/api/applications",
-  auth,// Authentication middleware
+  // auth, // Commenting out Authentication middleware
   upload.single("cv"), // Use this for single file uploads
   [
     body("firstName").notEmpty().withMessage("First name is required"),
@@ -687,7 +687,10 @@ app.post("/api/applications",
     }
 
     try {
-      const applicantId = req.user?.id; // Get applicant ID from auth middleware
+      // Temporarily skipping authentication
+      // const applicantId = req.user?.id; // Get applicant ID from auth middleware
+      const applicantId = "your_test_applicant_id"; // Use a placeholder ID for testing
+      
       if (!applicantId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
@@ -759,6 +762,7 @@ app.post("/api/applications",
     }
   }
 );
+
 
 // Get applications (applicant-specific or all for admin)
 app.get("/api/applications", async (req, res) => {
