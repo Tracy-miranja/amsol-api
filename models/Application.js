@@ -2,16 +2,16 @@ const mongoose = require("mongoose");
 
 const applicationSchema = new mongoose.Schema(
   {
-    applicant: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+    // applicant: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "User",
       
-    },
-    job: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Job",
+    // },
+    // job: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "Job",
       
-    },
+    // },
     resume: {
       type: String,
       
