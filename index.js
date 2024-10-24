@@ -43,29 +43,38 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+const allowedOrigins = [
+  "http://localhost:5174",
+  "http://localhost:5173",
+  "https://amsoljobs.africa", // Main domain
+  /\.amsoljobs\.africa$/,     // Regex for subdomains
+  "https://amsol-api.onrender.com", // API domain (without route)
+];
+
 const corsOptions = {
   origin: (origin, callback) => {
-    const allowedOrigins = [
-      "http://localhost:5174",
-      "http://localhost:5173",
-      "https://amsol-api.onrender.com/api/login",
-      "https://amsoljobs.africa/",
-      /\.amsoljobs\.africa$/,  // Regex to allow all subdomains
-    ];
-    
     if (allowedOrigins.some(o => o instanceof RegExp ? o.test(origin) : o === origin) || !origin) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
     }
   },
-  credentials: true,  // Required to allow cookies across subdomains
+  credentials: true,  // Allow cookies across domains
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 };
 
+// Apply CORS middleware
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // Handle preflight requests
+
+// Handle preflight requests explicitly
+app.options("*", (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.sendStatus(204); // No content response
+});
 
 // Database Instance
 require("dotenv").config();
